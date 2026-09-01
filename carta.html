@@ -183,16 +183,54 @@
     color:var(--gold-bright);
   }
 
-  .song{
+    .player{
     display:flex;
-    align-items:baseline;
-    gap:10px;
-    font-size:15px;
-    color:var(--bone-dim);
+    align-items:center;
+    gap:14px;
     border-top:1px solid rgba(179,58,58,.2);
     padding-top:16px;
   }
-  .song .note{color:var(--gold);font-size:16px;}
+  .play-btn{
+    flex:none;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    background:var(--ink-2);
+    color:var(--bone);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    padding:0;
+  }
+  .play-btn svg{width:16px;height:16px;fill:var(--gold-bright);}
+  .play-btn .icon-pause{display:none;}
+  .play-btn.is-playing .icon-play{display:none;}
+  .play-btn.is-playing .icon-pause{display:block;}
+  .player-info{flex:1;min-width:0;}
+  .player-title{
+    font-size:14px;
+    color:var(--bone-dim);
+    margin:0 0 8px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .player-track{
+    position:relative;
+    height:3px;
+    border-radius:2px;
+    background:rgba(179,58,58,.25);
+    cursor:pointer;
+  }
+  .player-fill{
+    position:absolute;
+    top:0;left:0;bottom:0;
+    width:0%;
+    background:var(--gold-bright);
+    border-radius:2px;
+  }
 
   /* ---- bloqueado ---- */
   .chapter.locked{
@@ -349,11 +387,12 @@ const chapters = [
      'Todo contigo se siente muy diferente pero para bien cada vez me convenzo de que somos la misma persona jajjaja y que tengamos tan pocas cosas en las que no estamos de acuerdo es la prueba de eso. Por eso el capítulo de hoy se llama "El destino", porque simplemente no hay otra explicación jjaja soy demasiado feliz contigo el haberte conocido ha sido de los giros de trama mas inesperados en toda mi vida y no siempre son tan buenos como el nuestro.',
      'Si hay algo que se muy bien es que eres la mujer más increible del universo, no existe nadie tan hermosa e inteligente como tu, te mereces lo mejor de lo mejor, feliz casi-cumpleaños, mi amor, te amo con todo mi corazommm'
    ],
-   signoff:'Besitos, pd: ha pasado tanto tiempo que ahora vivimos juntos y tenemos dos gatos jjejejje'},
-  {n:2, title:'[ tema del capítulo 2 ]', phrase:'[ acá va tu frase escrita a mano ]', song:'[ canción · artista ]'},
-  {n:3, title:'[ tema del capítulo 3 ]', phrase:'[ acá va tu frase escrita a mano ]', song:'[ canción · artista ]'},
-  {n:4, title:'[ tema del capítulo 4 ]', phrase:'[ acá va tu frase escrita a mano ]', song:'[ canción · artista ]'},
-  {n:5, title:'[ tema del capítulo final ]', phrase:'[ tu mensaje de cumpleaños ]', song:'[ canción · artista ]'},
+   signoff:'Besitos, pd: ha pasado tanto tiempo que ahora vivimos juntos y tenemos dos gatos jjejejje',
+   song:{title:'[ canción · artista ]', src:'/songs/Procedimientos Para Llegar A Un Común Acuerdo.mp3'}},
+  {n:2, title:'[ tema del capítulo 2 ]', phrase:'[ acá va tu frase escrita a mano ]', song:{title:'[ canción · artista ]', src:'audio/capitulo-2.mp3'}},
+  {n:3, title:'[ tema del capítulo 3 ]', phrase:'[ acá va tu frase escrita a mano ]', song:{title:'[ canción · artista ]', src:'audio/capitulo-3.mp3'}},
+  {n:4, title:'[ tema del capítulo 4 ]', phrase:'[ acá va tu frase escrita a mano ]', song:{title:'[ canción · artista ]', src:'audio/capitulo-4.mp3'}},
+  {n:5, title:'[ tema del capítulo final ]', phrase:'[ tu mensaje de cumpleaños ]', song:{title:'[ canción · artista ]', src:'audio/capitulo-5.mp3'}},
 ];
 
 const unlockDates = {
@@ -450,6 +489,7 @@ function render(){
         <h2>${ch.title}</h2>
         <div class="video-frame"><span>tu video acá</span></div>
         <p class="phrase hand">${ch.phrase}</p>
+        ${playerMarkup(ch.song)}
       `;
     } else {
       section.className = 'chapter';
@@ -460,10 +500,54 @@ function render(){
         ${ch.letter
           ? `<div class="letter">${ch.letter.map(p => `<p>${p}</p>`).join('')}</div><p class="phrase hand">${ch.signoff}</p>`
           : `<p class="phrase hand">${ch.phrase}</p>`}
+        ${playerMarkup(ch.song)}
       `;
     }
 
     container.appendChild(section);
+  });
+
+  attachPlayers();
+}
+
+function playerMarkup(song){
+  return `
+    <div class="player">
+      <button class="play-btn" type="button" aria-label="reproducir">
+        <svg class="icon-play" viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
+      <div class="player-info">
+        <p class="player-title">${song.title}</p>
+        <div class="player-track"><div class="player-fill"></div></div>
+      </div>
+    </div>
+    <audio class="player-audio" src="${song.src}" preload="none"></audio>
+  `;
+}
+
+function attachPlayers(){
+  document.querySelectorAll('.player').forEach(playerEl => {
+    const audio = playerEl.nextElementSibling;
+    const btn = playerEl.querySelector('.play-btn');
+    const fill = playerEl.querySelector('.player-fill');
+    const track = playerEl.querySelector('.player-track');
+
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('audio').forEach(a => { if(a !== audio) a.pause(); });
+      audio.paused ? audio.play() : audio.pause();
+    });
+    audio.addEventListener('play', () => btn.classList.add('is-playing'));
+    audio.addEventListener('pause', () => btn.classList.remove('is-playing'));
+    audio.addEventListener('ended', () => { btn.classList.remove('is-playing'); fill.style.width = '0%'; });
+    audio.addEventListener('timeupdate', () => {
+      if(audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    });
+    track.addEventListener('click', (e) => {
+      if(!audio.duration) return;
+      const rect = track.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    });
   });
 }
 
