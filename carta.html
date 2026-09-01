@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Año de Gracia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Crimson+Pro:wght@300;400;500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0A0A;
+    --ink-2:#151010;
+    --bone:#EDE7D6;
+    --bone-dim:#9C8F86;
+    --gold:#B33A3A;
+    --gold-bright:#E2585B;
+    --ribbon:#7A2E2E;
+    --moss:#3A2323;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--bone);
+    font-family:'Crimson Pro',serif;
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    letter-spacing:.02em;
+  }
+  .hand{
+    font-family:'Caveat',cursive;
+  }
+
+  /* ---- indice / lomo ---- */
+  .spine{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    width:100%;
+    z-index:10;
+    display:flex;
+    justify-content:center;
+    gap:0;
+    background:linear-gradient(180deg, var(--ink) 60%, transparent);
+    padding:18px 12px 10px;
+  }
+  .spine-mark{
+    position:relative;
+    width:40px;
+    height:40px;
+    margin:0 6px;
+    border-radius:50%;
+    border:1px solid var(--moss);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Cormorant Garamond',serif;
+    font-size:16px;
+    color:var(--bone-dim);
+    background:var(--ink-2);
+    cursor:pointer;
+    transition:border-color .3s ease, color .3s ease;
+    margin-left:1rem!important;
+  }
+  .spine-mark.unlocked{
+    border-color:var(--gold);
+    color:var(--gold-bright);
+  }
+  .spine-mark.today{
+    border-color:var(--gold-bright);
+    color:var(--ink);
+    background:var(--gold-bright);
+  }
+  .spine-mark.chapter5{
+    border-color:var(--ribbon);
+  }
+  .spine-mark.chapter5.unlocked{
+    border-color:var(--gold-bright);
+  }
+  .spine-mark.viewing{
+    outline:2px solid var(--gold-bright);
+    outline-offset:2px;
+  }
+  .spine-line{
+    position:absolute;
+    top:50%;
+    left:100%;
+    width:12px;
+    height:1px;
+    background:var(--moss);
+  }
+  .spine-mark:last-child .spine-line{display:none;}
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:90px 24px 60px;
+  }
+
+  .cover{
+    text-align:center;
+    padding:20px 0 60px;
+    border-bottom:1px solid rgba(179,58,58,.15);
+  }
+  .cover-title{
+    font-size:46px;
+    margin:0 0 14px;
+  }
+  .cover-sub{
+    font-size:15px;
+    color:var(--bone-dim);
+    margin:0 0 10px;
+  }
+  .cover-for{
+    font-family:'Caveat',cursive;
+    font-size:24px;
+    color:var(--gold-bright);
+    margin:0;
+  }
+
+  /* ---- capitulo ---- */
+  .chapter{
+    min-height:78vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:60px 0;
+    border-bottom:1px solid rgba(179,58,58,.15);
+  }
+  .chapter:last-of-type{border-bottom:none;}
+
+  .eyebrow{
+    font-size:14px;
+    color:var(--gold);
+    letter-spacing:.04em;
+    margin:0 0 6px;
+  }
+  .chapter h2{
+    font-size:38px;
+    margin:0 0 28px;
+    line-height:1.15;
+  }
+  .motif{
+    width:56px;
+    height:56px;
+    margin-bottom:28px;
+  }
+  .motif svg{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+
+  .phrase{
+    font-family:'Caveat',cursive;
+    font-size:30px;
+    line-height:1.35;
+    color:var(--bone);
+    margin:0 0 32px;
+    max-width:26ch;
+  }
+
+  .letter{
+    font-family:'Crimson Pro',serif;
+    font-size:20px;
+    line-height:1.75;
+    color:var(--bone);
+    margin:0 0 20px;
+  }
+  .letter p{margin:0 0 14px;}
+  .letter p:first-of-type::first-letter{
+    font-family:'Cormorant Garamond',serif;
+    font-size:42px;
+    float:left;
+    line-height:.8;
+    padding:4px 8px 0 0;
+    color:var(--gold-bright);
+  }
+
+  .song{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    font-size:15px;
+    color:var(--bone-dim);
+    border-top:1px solid rgba(179,58,58,.2);
+    padding-top:16px;
+  }
+  .song .note{color:var(--gold);font-size:16px;}
+
+  /* ---- bloqueado ---- */
+  .chapter.locked{
+    align-items:center;
+    text-align:center;
+  }
+  .seal{
+    width:88px;
+    height:88px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #8C3A3A, var(--ribbon) 70%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Cormorant Garamond',serif;
+    font-size:34px;
+    color:var(--bone);
+    margin-bottom:22px;
+    position:relative;
+  }
+  .ribbon-strip{
+    position:absolute;
+    top:-10px;
+    left:50%;
+    transform:translateX(-50%) rotate(-3deg);
+    width:150px;
+    height:22px;
+    background:var(--ribbon);
+    opacity:.55;
+  }
+  .locked-label{
+    font-size:15px;
+    color:var(--bone-dim);
+    margin:0 0 4px;
+  }
+  .locked-date{
+    font-size:14px;
+    color:var(--gold);
+    font-style:italic;
+  }
+  .countdown{
+    display:flex;
+    gap:16px;
+    margin:6px 0 14px;
+  }
+  .countdown-unit{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .countdown-unit .num{
+    font-family:'Cormorant Garamond',serif;
+    font-size:28px;
+    color:var(--gold-bright);
+    line-height:1;
+  }
+  .countdown-unit .unit-label{
+    font-size:11px;
+    color:var(--bone-dim);
+    letter-spacing:.03em;
+    margin-top:4px;
+  }
+
+  /* ---- capitulo 5 especial ---- */
+  .chapter.finale{
+    position:relative;
+    align-items:center;
+    text-align:center;
+    overflow:hidden;
+  }
+  .glow{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:560px;
+    height:560px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(226,88,91,.4), transparent 70%);
+    animation:flicker 4s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .video-frame{
+    position:relative;
+    width:220px;
+    aspect-ratio:9/16;
+    margin:0 auto 28px;
+    border:1px solid var(--gold);
+    border-radius:14px;
+    background:rgba(0,0,0,.35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .video-frame span{
+    font-size:13px;
+    color:var(--bone-dim);
+    padding:0 20px;
+    text-align:center;
+  }
+  @keyframes flicker{
+    0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1);}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.06);}
+  }
+  .finale .eyebrow{color:var(--gold-bright);}
+  .finale h2{font-size:44px;}
+  .finale .phrase{font-size:34px;max-width:22ch;margin-left:auto;margin-right:auto;}
+
+  @media (prefers-reduced-motion: reduce){
+    .glow{animation:none;}
+  }
+
+  @media (min-width:900px){
+    main{padding-left:100px;padding-top:60px;}
+    .spine{
+      position:fixed;
+      top:0;
+      left:0;
+      flex-direction:column;
+      height:100vh;
+      width:88px;
+      justify-content:center;
+      background:linear-gradient(90deg, var(--ink) 60%, transparent);
+      padding:0;
+    }
+    .spine-mark{margin:8px 0;}
+    .spine-line{
+      top:100%;
+      left:50%;
+      width:1px;
+      height:12px;
+      transform:translateX(-50%);
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav class="spine" id="spine"></nav>
+
+<main id="main">
+  <header class="cover">
+    <h1 class="cover-title">Para Balesch</h1>
+    <p class="cover-sub">El libro que nunca vas a encontrar en una librería</p>
+    <p class="cover-for">te amo muchommm <3 </p>
+  </header>
+  <div id="chapters"></div>
+</main>
+
+<script>
+const chapters = [
+  {n:1, title:'El destino',
+   letter:[
+     'No sé bien cómo empezar esto sin sonar cursi, así que voy a intentarlo igual. Hace un año no sabía que este iba a ser el año en que más iba a aprender a quererte de verdad.',
+     'Este primer capítulo es apenas el comienzo del camino que hicimos juntos — todavía no sabíamos bien para dónde íbamos, pero íbamos juntos. Eso ya era suficiente.'
+   ],
+   signoff:'con todo mi cariño,',
+   song:'[ canción · artista ]'},
+  {n:2, title:'[ tema del capítulo 2 ]', phrase:'[ acá va tu frase escrita a mano ]', song:'[ canción · artista ]'},
+  {n:3, title:'[ tema del capítulo 3 ]', phrase:'[ acá va tu frase escrita a mano ]', song:'[ canción · artista ]'},
+  {n:4, title:'[ tema del capítulo 4 ]', phrase:'[ acá va tu frase escrita a mano ]', song:'[ canción · artista ]'},
+  {n:5, title:'[ tema del capítulo final ]', phrase:'[ tu mensaje de cumpleaños ]', song:'[ canción · artista ]'},
+];
+
+const unlockDates = {
+  1: new Date(2026,8,1,0,0,0),
+  2: new Date(2026,8,2,0,0,0),
+  3: new Date(2026,8,3,0,0,0),
+  4: new Date(2026,8,4,0,0,0),
+  5: new Date(2026,8,5,0,0,0),
+};
+
+const YINYANG_SVG = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="31" fill="#EDE7D6"/>
+  <path d="M32,1 A15,15 0 0,1 32,32 A15,15 0 0,0 32,63 A31,31 0 0,1 32,1 Z" fill="#3A2323"/>
+  <circle cx="32" cy="16" r="5" fill="#3A2323"/>
+  <circle cx="32" cy="48" r="5" fill="#EDE7D6"/>
+  <circle cx="32" cy="32" r="31" fill="none" stroke="#B33A3A" stroke-width="1"/>
+</svg>`;
+
+let today = 0;
+let viewingId = null;
+let observer = null;
+
+function getPreviewOverride(){
+  const params = new URLSearchParams(window.location.search);
+  const p = params.get('preview');
+  if(p === null) return null;
+  const n = parseInt(p, 10);
+  return (!isNaN(n) && n >= 0 && n <= 5) ? n : null;
+}
+const previewOverride = getPreviewOverride();
+
+function tickCountdowns(){
+  const now = new Date();
+  chapters.forEach(ch => {
+    const el = document.getElementById('cd-' + ch.n);
+    if(!el) return;
+    let diff = unlockDates[ch.n] - now;
+    if(diff < 0) diff = 0;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.querySelector('.cd-d .num').textContent = d;
+    el.querySelector('.cd-h .num').textContent = h;
+    el.querySelector('.cd-m .num').textContent = m;
+    el.querySelector('.cd-s .num').textContent = s;
+  });
+}
+
+function render(){
+  const spine = document.getElementById('spine');
+  const container = document.getElementById('chapters');
+  spine.innerHTML = '';
+  container.innerHTML = '';
+
+  chapters.forEach(ch => {
+    const unlocked = ch.n <= today;
+    const isToday = ch.n === today;
+
+    const mark = document.createElement('div');
+    mark.className = 'spine-mark' + (unlocked ? ' unlocked' : '') + (isToday ? ' today' : '') + (ch.n === 5 ? ' chapter5' : '') + (viewingId === ch.n ? ' viewing' : '');
+    mark.dataset.n = ch.n;
+    mark.textContent = ch.n;
+    mark.innerHTML += '<span class="spine-line"></span>';
+    mark.addEventListener('click', () => {
+      document.getElementById('ch-' + ch.n).scrollIntoView({behavior:'smooth', block:'start'});
+      document.querySelectorAll('.spine-mark').forEach(m => m.classList.remove('viewing'));
+      mark.classList.add('viewing');
+      viewingId = ch.n;
+    });
+    spine.appendChild(mark);
+
+    const section = document.createElement('section');
+    section.id = 'ch-' + ch.n;
+
+    if (!unlocked) {
+      section.className = 'chapter locked';
+      section.innerHTML = `
+        <div class="seal"><div class="ribbon-strip"></div>${ch.n}</div>
+        <p class="locked-label">aún no es tiempo</p>
+        <div class="countdown" id="cd-${ch.n}">
+          <div class="countdown-unit cd-d"><span class="num">–</span><span class="unit-label">días</span></div>
+          <div class="countdown-unit cd-h"><span class="num">–</span><span class="unit-label">horas</span></div>
+          <div class="countdown-unit cd-m"><span class="num">–</span><span class="unit-label">min</span></div>
+          <div class="countdown-unit cd-s"><span class="num">–</span><span class="unit-label">seg</span></div>
+        </div>
+        <p class="locked-date">se abre el ${ch.n} de septiembre</p>
+      `;
+    } else if (ch.n === 5) {
+      section.className = 'chapter finale';
+      section.innerHTML = `
+        <div class="glow"></div>
+        <p class="eyebrow">capítulo 5 · el final</p>
+        <h2>${ch.title}</h2>
+        <div class="video-frame"><span>tu video acá</span></div>
+        <p class="phrase hand">${ch.phrase}</p>
+        <div class="song"><span class="note">♪</span> ${ch.song}</div>
+      `;
+    } else {
+      section.className = 'chapter';
+      section.innerHTML = `
+        <p class="eyebrow">capítulo ${ch.n}</p>
+        <h2>${ch.title}</h2>
+        <div class="motif">${YINYANG_SVG}</div>
+        ${ch.letter
+          ? `<div class="letter">${ch.letter.map(p => `<p>${p}</p>`).join('')}</div><p class="phrase hand">${ch.signoff}</p>`
+          : `<p class="phrase hand">${ch.phrase}</p>`}
+        <div class="song"><span class="note">♪</span> ${ch.song}</div>
+      `;
+    }
+
+    container.appendChild(section);
+  });
+}
+
+function setupObserver(){
+  if(observer) observer.disconnect();
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const n = parseInt(entry.target.id.replace('ch-',''), 10);
+        viewingId = n;
+        document.querySelectorAll('.spine-mark').forEach(m => m.classList.remove('viewing'));
+        const mark = document.querySelector('.spine-mark[data-n="' + n + '"]');
+        if(mark) mark.classList.add('viewing');
+      }
+    });
+  }, {threshold:0.5});
+  document.querySelectorAll('.chapter').forEach(sec => observer.observe(sec));
+}
+
+function refreshUnlockState(){
+  const now = new Date();
+  let newToday = 0;
+  chapters.forEach(ch => { if(unlockDates[ch.n] <= now) newToday = ch.n; });
+  if(previewOverride !== null) newToday = previewOverride;
+  if(newToday !== today){
+    today = newToday;
+    render();
+    setupObserver();
+  }
+  tickCountdowns();
+}
+
+render();
+setupObserver();
+refreshUnlockState();
+setInterval(refreshUnlockState, 1000);
+</script>
+
+</body>
+</html>
