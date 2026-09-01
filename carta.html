@@ -449,7 +449,6 @@ function render(){
         <h2>${ch.title}</h2>
         <div class="video-frame"><span>tu video acá</span></div>
         <p class="phrase hand">${ch.phrase}</p>
-        <div class="song"><span class="note">♪</span> ${ch.song}</div>
       `;
     } else {
       section.className = 'chapter';
@@ -460,7 +459,6 @@ function render(){
         ${ch.letter
           ? `<div class="letter">${ch.letter.map(p => `<p>${p}</p>`).join('')}</div><p class="phrase hand">${ch.signoff}</p>`
           : `<p class="phrase hand">${ch.phrase}</p>`}
-        <div class="song"><span class="note">♪</span> ${ch.song}</div>
       `;
     }
 
