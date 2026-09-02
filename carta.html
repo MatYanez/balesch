@@ -323,12 +323,39 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    overflow:hidden;
+    cursor:pointer;
   }
-  .video-frame span{
-    font-size:13px;
-    color:var(--bone-dim);
-    padding:0 20px;
-    text-align:center;
+  .video-frame video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .video-play-btn{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    background:rgba(10,10,10,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:opacity .25s ease;
+  }
+  .video-play-btn svg{
+    width:20px;
+    height:20px;
+    fill:var(--bone);
+    margin-left:3px;
+  }
+  .video-frame.is-playing .video-play-btn{
+    opacity:0;
+    pointer-events:none;
   }
   @keyframes flicker{
     0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1);}
@@ -497,7 +524,12 @@ function render(){
         <div class="glow"></div>
         <p class="eyebrow">capítulo 5 · el final</p>
         <h2>${ch.title}</h2>
-        <div class="video-frame"><span>tu video acá</span></div>
+                <div class="video-frame" id="finale-video-frame">
+          <video id="finale-video" src="video/saludos.mp4" playsinline preload="metadata"></video>
+          <button class="video-play-btn" type="button" aria-label="reproducir video">
+            <svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg>
+          </button>
+        </div>
         <p class="phrase hand">${ch.phrase}</p>
         ${playerMarkup(ch.song)}
       `;
@@ -518,6 +550,35 @@ function render(){
   });
 
   attachPlayers();
+  attachVideo();
+}
+
+function attachVideo(){
+  const frame = document.getElementById('finale-video-frame');
+  if(!frame) return;
+  const video = document.getElementById('finale-video');
+  const btn = frame.querySelector('.video-play-btn');
+
+  function goFullscreen(){
+    if(video.requestFullscreen) video.requestFullscreen();
+    else if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+    else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+  }
+
+  function playVideo(){
+    document.querySelectorAll('audio').forEach(a => a.pause());
+    goFullscreen();
+    video.play();
+    frame.classList.add('is-playing');
+  }
+
+  frame.addEventListener('click', playVideo);
+  btn.addEventListener('click', (e) => { e.stopPropagation(); playVideo(); });
+  video.addEventListener('pause', () => frame.classList.remove('is-playing'));
+  video.addEventListener('ended', () => frame.classList.remove('is-playing'));
+  document.addEventListener('fullscreenchange', () => {
+    if(!document.fullscreenElement && !video.paused) video.pause();
+  });
 }
 
 function playerMarkup(song){
