@@ -490,6 +490,36 @@ const YINYANG_SVG = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"
 let today = 0;
 let viewingId = null;
 let observer = null;
+let ytPlayer = null;
+let ytApiReady = false;
+
+const ytScriptTag = document.createElement('script');
+ytScriptTag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(ytScriptTag);
+
+window.onYouTubeIframeAPIReady = function(){
+  ytApiReady = true;
+  initYouTubePlayer();
+};
+
+function initYouTubePlayer(){
+  const iframe = document.getElementById('finale-youtube');
+  if(!iframe || !ytApiReady) return;
+  ytPlayer = new YT.Player('finale-youtube', {
+    events: {
+      'onStateChange': onYouTubeStateChange
+    }
+  });
+}
+
+function onYouTubeStateChange(event){
+  if(event.data === YT.PlayerState.PLAYING){
+    const iframe = document.getElementById('finale-youtube');
+    if(!iframe) return;
+    if(iframe.requestFullscreen) iframe.requestFullscreen();
+    else if(iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+  }
+}
 
 function getPreviewOverride(){
   const params = new URLSearchParams(window.location.search);
@@ -564,7 +594,7 @@ function render(){
         <p class="eyebrow">capítulo 5 · el final</p>
         <h2>${ch.title}</h2>
         <div class="youtube-frame">
-          <iframe src="https://www.youtube.com/embed/ke5ALMi3eNQ" title="video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <iframe id="finale-youtube" src="https://www.youtube.com/embed/ke5ALMi3eNQ?enablejsapi=1" title="video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
         <p class="phrase hand">${ch.phrase}</p>
         ${playerMarkup(ch.song)}
@@ -587,6 +617,7 @@ function render(){
 
   attachPlayers();
   attachVideo();
+  if(document.getElementById('finale-youtube')) initYouTubePlayer();
 }
 
 function attachVideo(){
