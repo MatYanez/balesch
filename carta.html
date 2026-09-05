@@ -335,6 +335,26 @@
     object-fit:cover;
     display:block;
   }
+  .youtube-frame{
+    position:relative;
+    width:100%;
+    max-width:400px;
+    aspect-ratio:3/2;
+    margin:0 auto 28px;
+    border:1px solid var(--gold);
+    border-radius:14px;
+    overflow:hidden;
+    background:rgba(0,0,0,.35);
+  }
+  .youtube-frame iframe{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+  }
   .video-play-btn{
     position:absolute;
     top:50%;
@@ -543,11 +563,8 @@ function render(){
         <div class="glow"></div>
         <p class="eyebrow">capítulo 5 · el final</p>
         <h2>${ch.title}</h2>
-                <div class="video-frame" id="finale-video-frame">
-          <video id="finale-video" src="video/saludos.mp4" playsinline preload="metadata"></video>
-          <button class="video-play-btn" type="button" aria-label="reproducir video">
-            <svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg>
-          </button>
+        <div class="youtube-frame">
+          <iframe src="https://www.youtube.com/embed/ke5ALMi3eNQ" title="video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
         <p class="phrase hand">${ch.phrase}</p>
         ${playerMarkup(ch.song)}
